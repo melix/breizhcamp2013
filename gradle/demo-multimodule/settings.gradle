@@ -1,0 +1,2 @@
+include 'bzh-core', 'bzh-xml', 'bzh-json'
+

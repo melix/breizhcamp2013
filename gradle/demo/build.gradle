@@ -1,0 +1,55 @@
+apply plugin:'java'
+
+repositories {
+    mavenCentral()
+}
+
+version='1.0.0-SNAPSHOT'
+
+dependencies {
+    testCompile "junit:junit:4.11"
+}
+
+sourceSets {
+    test {
+        java.srcDir file ('src/test/boo')
+    }
+}
+
+task hello << {
+    println 'Hello, world!'
+}
+
+task sourceList(type: SourceFileList) {
+    output = file("$buildDir/files.txt")
+}
+
+jar {
+    dependsOn sourceList
+    from file("$buildDir/files.txt")
+}
+
+class SourceFileList extends DefaultTask {
+
+    @Input
+    FileCollection input = project.sourceSets.main.allSource
+
+    @OutputFile
+    File output = new File("${project.buildDir}/sourcefiles.txt")
+
+    @TaskAction
+    void generateSourceFileList() {
+        output.withWriter { writer ->
+            writer << "File generated at ${new Date()}\n"
+            project.sourceSets.main.allSource.each {
+                writer << "$it\n"
+            }
+        }
+    }
+}
+
+apply plugin: 'compare-gradle-builds'
+
+compareGradleBuilds {
+    targetBuild.gradleVersion = '1.6'
+}
